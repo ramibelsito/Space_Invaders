@@ -850,6 +850,7 @@ static int printMenu(int opcion, void* frontend, int* pausa, highscore_t * highs
 
 #ifdef RASPI
 	void printPuntaje ( int puntaje );
+	void copy_matrix( const int * matrix, int x, int y);
 
     void * updateDisplay(void * argumentosVarios)
 	{
@@ -1015,6 +1016,7 @@ static int printMenu(int opcion, void* frontend, int* pausa, highscore_t * highs
 								printPuntaje(jugador.puntaje);
 								previous_position = PUNTAJE;
 							}
+							break;
 						}
 						case SHOW_HIGHSCORE:
 						{
@@ -1037,7 +1039,7 @@ static int printMenu(int opcion, void* frontend, int* pausa, highscore_t * highs
 		pthread_exit(NULL);
 	}
 
-static int printMenu (int representacion, void * frontend, int* pausa, highscore_t * highscores_p, int * dificultad_p) 
+static int printMenu (int representacion, void * frontend, int* pausa, highscore_t * highscores_p, unsigned int * dificultad_p) 
 {
 	disp_clear();
 	int i, j;
@@ -1068,49 +1070,42 @@ static int printMenu (int representacion, void * frontend, int* pausa, highscore
 
 void printPuntaje ( int puntaje )
 {
-	int i, j, numero, k;
-	int multiplicador;
-	const int * matriz;
-	dcoord_t coords;
-	coords.x = 0;
-	coords.y = 5;
-	for (i = 3; i >= 0; i ++)
+	int i, x = 1, y = 5;
+	int * matrix;
+	char puntaje_chars[5];
+	printf("Puntaje int: %d\n", puntaje);
+	sprintf(puntaje_chars, "%04d", puntaje);
+	printf ("Puntaje char: %s.\n", puntaje_chars);
+	
+	for (i = 0; i < 4; i++)
 	{
-		if (i == 3)
-		{
-			multiplicador = 1000;
-		}
-		else if (i ==2)
-		{
-			multiplicador = 100;
-		}
-		else if (i == 1)
-		{
-			multiplicador = 10;
-		}
-		else if (i == 0)
-		{
-			multiplicador = 1;
-		}
-		numero = (puntaje / multiplicador) + '0';
-		matriz = detectMatrix((char)numero);
-		for (j = 0; j< MAX_DISP_Y ; j++)
-		{
-			for (k = 0; k < MAX_DISP_X; k++)
-			{
-				if (*(matriz + j*MAX_DISP_X +k) == 1)
-				{
-					coords.x = 1+k;
-					disp_write(coords, D_ON);
-				}
-			}
-		}
-		coords.x = 0;
-		coords.x += (NUMBER_X + 1);
+		matrix = detectMatrix(puntaje_chars[i]);
+		printf("Asigno matriz numero %d",i);
+		copy_matrix (matrix,x,y);
+		x+=4;
 	}
 	disp_update();
 
 }
+
+void copy_matrix( const int * matrix, int x, int y) 
+{
+    int i, j;
+	dcoord_t coords;
+    for (i = 0; i < NUMBER_Y; i++) 
+	{
+        for (j = 0; j < NUMBER_X; j++) 
+		{
+			coords.x = j+x;
+			coords.y = i+y;
+			if (*(matrix + i*NUMBER_X + j) == 1)
+			{
+				disp_write(coords, D_ON);
+			}
+        }
+    }
+}
+
 
 int input (void)
 {

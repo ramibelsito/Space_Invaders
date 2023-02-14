@@ -13,7 +13,7 @@
 
 #include "standard.h"
 
-const int * detectMatrix (char letter);//Asigna la matriz dibujo .
+ int * detectMatrix (char letter);//Asigna la matriz dibujo .
 void paint (dcoord_t coordenada, dlevel_t val, const int matriz[MAX_DISP_X][MAX_DISP_Y]);
 void printObject (int posicion[2], dlevel_t valor, char objeto, int tipo);
 
