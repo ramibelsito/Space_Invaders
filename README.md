@@ -1,1 +1,51 @@
-# Space_Invaders
+# Space-Invaders
+El juego tiene 5 niveles, pudiendo elegir como nivel de inicio a cualquiera de los tres primeros.
+Es decir, para superar el nivel "hell" (nivel 5), sí o sí hay que superar "hard" y "hardcore", haciendo
+que en cualquiera de las tres dificultades iniciales, el jugador tenga un sentimiento de 
+progresión a medida que supera los distintos escenarios.
+Una vez que se alcanza el nivel 5, en caso de superarlo, podrá repetirlo indefinidamente hasta 
+perder para lograr así superar su récord.
+Al perder o al reiniciar, la dificultad se setea en "defaultDifficulty" que, en caso de que el jugador
+no haya seleccionado nada en el "difficultyMenu", la misma será "easy" (nivel 1).
+
+Las barreras en ALLEGRO no están hardocedeadas. En función del ancho del display, la cantidad de 
+barreras y el tamaño de ellas, las mismas se orden automáticamente.
+Sin embargo, en RASPI, debido a que la misma cuenta únicamente con 16 píxeles de ancho, existe una
+única disposición óptima en el acotado espacio disponible, así que optamos por hardcodearlas.
+
+El proyecto cuenta con cuatro threads, uno que maneja el display (con switches de compilación), otro
+que le da vida a los aliens, un tercero que desplaza las balas a través del display y un último
+que se encarga de analizar las colisiones y actuar en consecuencia (sumar puntos, "matar" objetos, etc)
+
+Podría hablarse, si se quiere, de un quinto thread, que en realidad se ejecuta en paralelo a los otros 
+cuatro pero en el mainstream. El mismo se encarga de manejar al jugador, y tiene tres condiciones de
+salida (y al salir del loop se encarga de "frenar" también a los otros cuatro).
+
+La primer condición es que el jugador aprete "pausa", en cuyo caso, el entorno del jugador (barreras,
+aliens, balas, etc) NO se resetea, de modo que al presionar PLAY nuevamente, todo siga exactamente 
+igual (a menos que selecciones "reiniciar" después de pausar, obviamente).
+La segunda, es que el jugador pierda todas sus vidas. En dicho caso, todo el entorno se resetea, tomando
+como referencia a la "defaultDifficulty", de modo que al presionar PLAY, el juego inicie 
+"desde cero".
+La última condición, es que el jugador supere el nivel, es decir, que elimine a todos los aliens.
+Este caso es similar al anterior, solo que al resetear el entorno, no se toma como referencia a la 
+"defaultDifficulty", sino a la siguiente respecto a la que se acaba de superar (a menos que ya se haya
+alcanzado el máximo nivel). Además, cabe destacar que en este caso NO se resetean las vidas ni el 
+puntaje del jugador, permitiendo que superar niveles de forma consecutiva sea la mejor manera de 
+romper tu propio récord.
+
+Actualmente, existen 3 tipos de aliens, que aparecena diferentes distancias respecto al jugador.
+Los de tipo 1 son los más alejados, y por lo tanto, los más difíciles de matar. Los de tipo 3, los 
+más fáciles, y así.
+En este momento, matar un alien de tipo 1 da 15 puntos, de tipo 2 da 10, y de tipo 3 da 5.
+Además, neutralizar una bala de alien (es decir, hacerla impactar con la tuya para que no te pegue)
+te suma 1 punto. Esta útlima no es una práctica que modifique considerablemente tu puntaje, pero es
+de vital importancia en casos de desempate (por ejemplo, cuando dos jugadores matan la misma cantidad
+de aliens).
+Por último, existe un tipo especial de alien, la nave nodriza, cuya aparición es aleatoria. La misma
+te entregará 50 puntos y un corazón extra si conseguís eliminarla. Pero cuidado, al tener más de tres
+corazones, recibir un disparo no sólo va a reducirte la vida, sino que también va a restarte 50 puntos.
+
+En caso de que tu puntaje final sea mayor al de la base de datos local, el jugador podrá registrar su 
+nuevo récord junto a un nick de cuatro caracteres. Así, su nombre y su marca personal aparecerán en el
+top 3 al ingersar al menu de "highscores". Felicitaciones! :)
