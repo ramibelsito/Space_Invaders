@@ -1,0 +1,6 @@
+dificultad_1: prob_disparo=1/70--nave_nodriza=1/50--vel_inicial=1.0--vida_barreras=5--vida_player=3
+dificultad_2: prob_disparo=1/65--nave_nodriza=1/65--vel_inicial=1.5--vida_barreras=5--vida_player=3
+dificultad_3: prob_disparo=1/55--nave_nodriza=1/75--vel_inicial=2.0--vida_barreras=3--vida_player=2
+dificultad_4: prob_disparo=1/30--nave_nodriza=1/85--vel_inicial=2.5--vida_barreras=2--vida_player=2
+dificultad_5: prob_disparo=1/20--nave_nodriza=1/99--vel_inicial=3.0--vida_barreras=0--vida_player=2
+RAMI 0893 NNNN 0617 RAMI 0243 
