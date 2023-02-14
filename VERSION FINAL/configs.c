@@ -178,7 +178,7 @@ configs_t set_difficulty(unsigned int dificultad)
     configuration.velocidad_aliens = (config_params[VEL_POS] - '0') + (0.1*(config_params[VEL_POS+2] - '0'));
     configuration.vida_barreras = config_params[VIDA_BARRERAS_POS] - '0';
     configuration.vida_player = config_params[VIDA_PLAYER_POS] - '0';
-	configuration.vida_aliens = dificultad;	//Por ahora son siempre así
+	configuration.vida_aliens = dificultad;	
 	configuration.dificultad = dificultad;
     configuration.velocidad_balas = VELOCIDAD_BALAS;
 
