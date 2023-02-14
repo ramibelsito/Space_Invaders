@@ -2,10 +2,8 @@
 #include "dibujosRaspi.h"
 #include "disdrv.h"
 
-/********************************************* **********************************
- * ROM CONST VARIABLES WITH GLOBAL SCOPE
- ******************************************************************************/
-//Se que son chars, lo dejo asi por ahora.
+
+//Matrices para dibujar sobre los LEDs de la RASPI.
  int matSPACEINVADERS[MAX_DISP_X][MAX_DISP_Y] = {
   {' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', ' ', '1'},
   {' ', ' ', '1', ' ', ' ', ' ', ' ', ' ', ' ', '1', ' ', ' ', ' ', ' ', ' ', ' '},
@@ -504,40 +502,26 @@
 		    return &matSHOW_HIGHSCORE[0][0]; //Si querria letra A, me devuelve puntero a matriz
 		    break;
 		}
-        case '\0':
-        {
-            printf("Terminador\n");
-            return 0;
-        }
-
 		default:
 		{
-		   // printf("Error. Lo que quiere dibujar no existe. Pruebe usando otra palabra al llamar a printMenu()\n");
+		    printf("Error. Lo que quiere dibujar no existe. Pruebe usando otra palabra al llamar a printMenu()\n");
 		    return NULL;
 		    break;
 		}
     }
 }
 
-//Me había olvidado de printObject y paint. Tengo que agregar lo de la ruta de información acá también.
+//Dibuja en buffer el dibujo asignado a el objeto.
 void printObject (int posicion[2], dlevel_t valor, char objeto, int tipo)
 {
     dcoord_t coordenadas;
     coordenadas.x = posicion[0];
     coordenadas.y = posicion[1];
-    // printf("Llegue a printObject.\n");
     switch (objeto)
     {
-        case PROYECTIL:
-        {
-            //printf ("Coordenadas BALA = [ %d, %d]\n", coordenadas.x, coordenadas.y);
-            disp_write (coordenadas, valor);
-            break;
-        }
         case ALIEN:
         {
-            //printf ("Coordenadas ALIEN = [ %d, %d]\n", coordenadas.x, coordenadas.y);
-            switch (tipo)
+            switch (tipo)//Segun tipo de alien.
             {
                 case 1:
                     paint (coordenadas, valor, matAliens1);
@@ -555,14 +539,13 @@ void printObject (int posicion[2], dlevel_t valor, char objeto, int tipo)
         }
         case JUGADOR:
         {
-            //printf ("Coordenadas NAVE = [ %d, %d]\n", coordenadas.x, coordenadas.y);
             paint(coordenadas, valor, matNAVE);
             break;
         }
         case BARRERA:
         {
             
-            if (tipo == 1)
+            if (tipo == 1)//Segun cantidad de vidas
             {
                 paint (coordenadas, valor, matBARRERAS1);
             }
@@ -585,8 +568,8 @@ void printObject (int posicion[2], dlevel_t valor, char objeto, int tipo)
     
 }
 
-
-void paint (dcoord_t coordenada, dlevel_t val, const int matriz[MAX_DISP_X][MAX_DISP_Y])//Coordenada es el punto, no el hitbox.
+//Copia en el buffer el dibujo (Barreras, Jugador y Aliens tienen todos el mismo hitbox).
+void paint (dcoord_t coordenada, dlevel_t val, const int matriz[MAX_DISP_X][MAX_DISP_Y])
 {
     int i, j;
     dcoord_t coords;
@@ -596,7 +579,7 @@ void paint (dcoord_t coordenada, dlevel_t val, const int matriz[MAX_DISP_X][MAX_
     {
         for (j = 0; j < HITBOX_ALIENS_X; j++)
         {
-            if (matriz[i][j] == ON)//La parte que quiero copiar
+            if (matriz[i][j] == ON)
             {
                 disp_write(coords, val);
             }

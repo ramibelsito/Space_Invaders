@@ -13,8 +13,28 @@
 
 #include "standard.h"
 
- int * detectMatrix (char letter);//Asigna la matriz dibujo .
+/**
+ * @brief Asigna la matrix dibujo. 
+ * @param letter Estructura de tipo dcoord_t, que contiene las coordenadas del punto al que se quiere escribir. 
+ * @return Puntero a la matriz dibujo.
+*/
+int * detectMatrix (char letter);
+
+/**
+ * @brief Pinta en buffer el diujo enviado. 
+ * @param coordenada Coordenada del objeto a dibujar. 
+ * @param val Encendido o Apagado.
+ * @param matriz	Dibujo.e
+*/ 
 void paint (dcoord_t coordenada, dlevel_t val, const int matriz[MAX_DISP_X][MAX_DISP_Y]);
+
+/**
+ * @brief Pinta en buffer el diujo asignado. 
+ * @param coordenada Coordenada del objeto a dibujar. 
+ * @param val Encendido o Apagado.
+ * @param objeto Objeto a dibujar
+ * @param tipo	Para asignar distintos dibujos a un objeto.
+*/
 void printObject (int posicion[2], dlevel_t valor, char objeto, int tipo);
 
 

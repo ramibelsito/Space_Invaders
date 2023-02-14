@@ -8,7 +8,11 @@ void * updateAliens	(); //Actualización de aliens (sus disparos y su desplazami
 void * updateBullets(); //Actualización de balas (desplazamiento)
 void * colitions	();	//Actualización de balas (colisiones y sus consecuencias)
 
-//Esta función NO debe llamarse si se hizo pausa porque resetea todo el "environment"!!
+/**
+ * @brief inicializa el backend segun la configuracion asignada. 
+ * @param configuration Struct que contiene la configuracion de un nivel. 
+ * @param nextLevelFlag Flag que indica si se paso de nivel
+*/
 void setBackend (configs_t configuration, int nextLevelFlag);
 //(Inicializa el entorno en función de la config recibida)
 

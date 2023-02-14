@@ -3,12 +3,13 @@
 
 	#include "standard.h" //Generalización de datos constantes y definiciones que son públicas para todos los módulos
 	
-    //Devuelve la razón por la que se interrumpió el juego. Recibe la configuración del nivel y los objetos del nivel
+    //Devuelve la razón por la que se interrumpió el juego. Recibe la configuración del nivel y los flags de estado del juego.
     int init_game (configs_t configuration, int pausa, int next_level);
 
     //Devuelve la acción correspondiente a la tecla presionada. Por ejemplo: 'W' significa 'arriba'
     int input (void);
 
+    //Thread para la implementacion de los dispalays
     void * updateDisplay(void *);   
 
     typedef struct

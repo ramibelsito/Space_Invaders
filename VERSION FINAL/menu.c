@@ -7,7 +7,10 @@ static int startMenu (configs_t * configuracion, highscore_t * highscore_p, unsi
 
 //Devuelve qué ítem del menú de dificultad seleccionó el jugador
 static int difficultyMenu(void);
-static void receive_letter(char string[], int i);
+
+#ifdef ALLEGRO
+    static void receive_letter(char string[], int i);
+#endif
 
 
 //Vars globales definidas fuera de este módulo y que igualmente se usan acá.
@@ -112,7 +115,7 @@ static int startMenu (configs_t * configuracion, highscore_t * highscore_p, unsi
                         break;
                     
 
-                    default: //Innecesario, lo deje porque es buena práctica.
+                    default: 
                         break;
                 }
             }
@@ -169,7 +172,7 @@ static int startMenu (configs_t * configuracion, highscore_t * highscore_p, unsi
                     sleep(2);
 					
 					int indice = process_score(jugador.puntaje, highscore_p);
-					if (indice != -1)	//Si hizo un récord, lo guardamos en el txt
+					if (indice != -1)	//Si hizo un récord, lo guardamos en el .txt.
 					{
 						//El nombre por defecto es "raspberryPi" porque desde la raspi no se puede elegir un nombre
 						char new_name[4] = "RBPI";
@@ -200,7 +203,7 @@ static int startMenu (configs_t * configuracion, highscore_t * highscore_p, unsi
 
                     configuracion->dificultad = defaultDifficulty;	//Por defecto, volvemos al nivel 1
 					return MUERTO;
-					break;	//Formalidad
+					break;	
 				}
 
 				case NEXT_LEVEL:
@@ -215,14 +218,14 @@ static int startMenu (configs_t * configuracion, highscore_t * highscore_p, unsi
 					    configuracion->dificultad++;
 				    }
 					return NEXT_LEVEL;
-				    break;	//Formalidad
+				    break;	
                 }
 				case ENTER://El menú de pausa es el de inicio, con la diferencia de que al poner "PLAY" va a seguir desde donde lo dejó.
 					pausa = 1;		//Avisamos que NO SE TIENE QUE RESETEAR EL NIVEL! Todo tiene que seguir exactamente como estaba
                     next_level = 0; //No pase de nivel.
                     position = PLAY;
-                    return CONTINUE;//Lo pensé así para simplificar el desarrollo. PD: Enter es pausa.
-				    break;	//Formalidad
+                    return CONTINUE;
+				    break;	
 
                 case RESTART:	//Vuelvo al nivel inicial (ya sea EASY o el que haya seleccionado el jugador en el difficultyMenu)
                     pausa = 0;		//Reseteo el nivel
@@ -234,7 +237,7 @@ static int startMenu (configs_t * configuracion, highscore_t * highscore_p, unsi
 
 				default: 
 					return ERROR; 
-				    break;	//Formalidad
+				    break;	
             }
             break;
         }
@@ -276,6 +279,8 @@ static int startMenu (configs_t * configuracion, highscore_t * highscore_p, unsi
     }
 }
 
+#ifdef ALLEGRO
+
 static void receive_letter(char string[], int i)
 {
     int inputs;
@@ -285,10 +290,6 @@ static void receive_letter(char string[], int i)
 	do
     {
         inputs = input();
-        if (inputs == ARRIBA || inputs == ABAJO)
-        {
-            printf("Error: No se puede mover arriba o abajo\n");
-        }
         if (inputs == DERECHA)
         {
             switch (position)
@@ -398,7 +399,7 @@ static void receive_letter(char string[], int i)
                     caracter = position;
                     break;
                 default:
-                    printf("intentase poner la enie, no hay enie!\n\n\n				Ñ				\n\n\n");
+                    printf("ERROR: No hay Ñ!\n");
                     break;
             }
         }
@@ -511,7 +512,7 @@ static void receive_letter(char string[], int i)
                     caracter = position;
 					break;
 				default:
-                    printf("intentase poner la enie, no hay enie!\n\n\n				Ñ				\n\n\n");
+                    printf("ERROR: No hay Ñ!\n");
                     break;
 			}
         }
@@ -520,6 +521,7 @@ static void receive_letter(char string[], int i)
 	string[i] = caracter;
     return;
 }
+#endif //ALLEGRO
 
 static int difficultyMenu(void)
 {
@@ -530,7 +532,7 @@ static int difficultyMenu(void)
 
     do
     {   
-        inputs = input();	//Recibo un input y lo analizo
+        inputs = input();	//Recibo un input
        
 	    if(inputs == ABAJO)
 		{
@@ -548,7 +550,7 @@ static int difficultyMenu(void)
                     dificultad = HARD;
                     break;
                 }
-                default: //Innecesario, lo deje por si lo usamos para algo.
+                default: 
                     break;
             }
 		}
@@ -569,7 +571,7 @@ static int difficultyMenu(void)
                     dificultad = MEDIUM;
                     break;
                 }
-                default: break; //Innecesario, lo deje por si lo usamos para algo.
+                default: break; 
             }
 		}
 

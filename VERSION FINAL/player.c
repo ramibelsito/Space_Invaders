@@ -33,7 +33,6 @@ static int printMenu(int opcion, void* frontend, int* pausa, highscore_t * highs
 	static void print_alphabet(char bold_key, ALLEGRO_FONT * font24, ALLEGRO_FONT * font36); 
 	
 	
-	//Falta que printee al jugador, puede ser?
     void * updateDisplay(void * argumentosVarios)
 	{
 		//Interpretamos el puntero como un puntero a display_t
@@ -44,7 +43,7 @@ static int printMenu(int opcion, void* frontend, int* pausa, highscore_t * highs
 		unsigned int * dificultad = thData_p->dificultad;
 		highscore_t * highscore_p =  thData_p->highscore_p;
 		int previous_position = PLAY;
-		ALLEGRO_DISPLAY * display = NULL;	//Por qué lo inicializan en NULL?
+		ALLEGRO_DISPLAY * display = NULL;	
 
 		if (!al_init())
 		{
@@ -166,7 +165,7 @@ static int printMenu(int opcion, void* frontend, int* pausa, highscore_t * highs
 						al_get_bitmap_height(background), 0 ,0 ,
 						al_get_display_width(display), al_get_display_height(display), 0);
 					
-					for (int i = 0; i < N; i++)			//Hay filas*columnas aliens en total.
+					for (int i = 0; i < N; i++)			
 					{
 				
 						
@@ -849,8 +848,11 @@ static int printMenu(int opcion, void* frontend, int* pausa, highscore_t * highs
 
 
 #ifdef RASPI
-	void printPuntaje ( int puntaje );
-	void copy_matrix( const int * matrix, int x, int y);
+	//Puntaje del jugador se imprime en pantalla.
+	static void printPuntaje ( int puntaje );
+
+	//Se copia en buffer una matriz a partir de las coordenadas (x,y) enviadas.
+	static void copy_matrix( const int * matrix, int x, int y);
 
     void * updateDisplay(void * argumentosVarios)
 	{
@@ -1045,13 +1047,13 @@ static int printMenu (int representacion, void * frontend, int* pausa, highscore
 	int i, j;
 	const int * matriz;
 	dcoord_t myPoint; 
-	if ( dificultad_p != NULL)
+	if ( dificultad_p != NULL)//Busco el "dibujo", segun el nivel.
 	{
 		matriz = detectMatrix ((char)(*dificultad_p + BUSQUEDA_MATRIZ_DIFICULTADES) );
 	}
 	else
 	{
-		matriz = detectMatrix ((char) representacion);
+		matriz = detectMatrix ((char) representacion);//Busco la matriz correspondionte.
 	}
 	for (j = 0, myPoint.x = DISP_MIN; j < MAX_DISP_X; j++, myPoint.x++)
 	{
@@ -1068,19 +1070,17 @@ static int printMenu (int representacion, void * frontend, int* pausa, highscore
 }
 
 
-void printPuntaje ( int puntaje )
+static void printPuntaje ( int puntaje )
 {
 	int i, x = 1, y = 5;
 	int * matrix;
 	char puntaje_chars[5];
-	printf("Puntaje int: %d\n", puntaje);
-	sprintf(puntaje_chars, "%04d", puntaje);
-	printf ("Puntaje char: %s.\n", puntaje_chars);
+	
+	sprintf(puntaje_chars, "%04d", puntaje); //Guardo el numero como string y relleno de 0 si es necesario.
 	
 	for (i = 0; i < 4; i++)
 	{
-		matrix = detectMatrix(puntaje_chars[i]);
-		printf("Asigno matriz numero %d",i);
+		matrix = detectMatrix(puntaje_chars[i]); //Busco la matriz asignada al numero.
 		copy_matrix (matrix,x,y);
 		x+=4;
 	}
@@ -1088,7 +1088,7 @@ void printPuntaje ( int puntaje )
 
 }
 
-void copy_matrix( const int * matrix, int x, int y) 
+static void copy_matrix( const int * matrix, int x, int y) 
 {
     int i, j;
 	dcoord_t coords;
