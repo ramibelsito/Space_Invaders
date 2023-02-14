@@ -49,3 +49,25 @@ corazones, recibir un disparo no sólo va a reducirte la vida, sino que también
 En caso de que tu puntaje final sea mayor al de la base de datos local, el jugador podrá registrar su 
 nuevo récord junto a un nick de cuatro caracteres. Así, su nombre y su marca personal aparecerán en el
 top 3 al ingersar al menu de "highscores". Felicitaciones! :)
+
+GUIA DE INSTALACION EN WINDOWS:
+1. Entrar a la Microsoft Store e instalar Windows Subsystem for Linux (wsl)
+2. En el menu de Start de Windows buscar "Windows Features"
+![image](https://user-images.githubusercontent.com/105401456/218674788-70625a72-3b6d-4fa7-a530-c7d8bc005787.png)
+Luego reiniciar la computadora.
+3. Abrir la comand prompt y correr los siguientes comandos:
+"wsl --list --online" (para mostrar las distros disponibles)
+"wsl --install <NOMBRE_DE_DISTRO"
+4. Luego de instalar la distro correr los siguientes comandos:
+"sudo apt update", "sudo apt upgrade", "sudo apt install git", "sudo apt install gcc", "sudo apt install make", 
+"sudo apt install liballegro5-dev"
+5. Clonar el repositorio con el comando: "git clone <LINK_AL_REPO>"
+6. Se creara una carpeta llamada "Space_Invaders" donde se encuentran los archivos del programa.
+
+GUIA DE EJECUCION:
+1. Entrar a la carpeta donde se encuentran los archivos de codigo: "cd ./Space_Invaders/VERSION_FINAL/"
+2. Correr el comando "make ALLEGRO=1"
+Si ya se corrieron estos comandos se creara un archivo "Space_Invaders_App" que le permitira ejecutar el 
+programa sin la necesidad de recompilarlo (simplemente ejecute: "./Space_Invaders_App").
+
+
