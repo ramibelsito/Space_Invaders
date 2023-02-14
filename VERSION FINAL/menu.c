@@ -44,7 +44,7 @@ int main(void)
     /*Estoy con errores que creo que se deben a que mi pc es lenta
     y la inicialización de allegro (en el thread) no llega a hacerse
 	antes de que el mainstream trate de usar las cosas de allegro*/
-    usleep(300*ONE_MS);    
+    usleep(500*ONE_MS);    
     
     //Mostramos el menú principal hasta que el jugador cierre el juego.
     while (QuitFlag != QUIT)
