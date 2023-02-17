@@ -53,6 +53,8 @@ En caso de que tu puntaje final sea mayor al de la base de datos local, el jugad
 nuevo récord junto a un nick de cuatro caracteres. Así, su nombre y su marca personal aparecerán en el
 top 3 al ingersar al menu de "highscores". Felicitaciones! :)
 
+-- creditos al creador del lofi loop: Bernat Cucarella Sifre :)
+
 GUIA DE INSTALACION EN WINDOWS:
 1. Entrar a la Microsoft Store e instalar Windows Subsystem for Linux (wsl)
 2. En el menu de Start de Windows buscar "Windows Features"
