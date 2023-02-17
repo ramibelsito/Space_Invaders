@@ -34,13 +34,13 @@ else
 ifdef ALLEGRO
 
 menu: standard.h menu.c player.h playerAL.o configs.h configs.o
-	gcc -Wall -g -o Space_Invaders_App menu.c playerAL.o configs.o entorno.o -lpthread -lallegro -lallegro_image -lallegro_font -lallegro_ttf -DALLEGRO
+	gcc -Wall -g -o Space_Invaders_App menu.c playerAL.o configs.o entorno.o -lpthread -lallegro -lallegro_image -lallegro_font -lallegro_ttf -lallegro_audio -lallegro_acodec -DALLEGRO
 
 configs.o: standard.h configs.h configs.c
 	gcc -Wall -g -c configs.c -DALLEGRO
 
 playerAL.o: standard.h player.h playerAL.c entorno.h entorno.o
-	gcc -Wall -g -c playerAL.c entorno.o -lpthread -lallegro -lallegro_image -lallegro_font -lallegro_ttf -DALLEGRO
+	gcc -Wall -g -c playerAL.c -lpthread -lallegro -lallegro_image -lallegro_font -lallegro_ttf -lallegro_audio -lallegro_acodec -DALLEGRO
 
 entorno.o: standard.h entorno.h entorno.c
 	gcc -Wall -g -c entorno.c -DALLEGRO

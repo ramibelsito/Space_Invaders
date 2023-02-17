@@ -6,6 +6,7 @@
 #include <allegro5/allegro_image.h>
 #include <allegro5/allegro_font.h>
 #include <allegro5/allegro_ttf.h>
+#include <allegro5/allegro_audio.h>
 #include <allegro5/allegro_acodec.h> 
 
 #define IN_ALPHABET(X) ( ((X) >= 'A') && ((X) <= 'Z') )
@@ -18,6 +19,13 @@ static void tittle_animation(ALLEGRO_BITMAP * space_invaders_tittle, ALLEGRO_DIS
 static float resize(float source_w, float source_h, float dest_w, float dest_h, int width_or_height);
 static void dibujar_alien(ALLEGRO_BITMAP * alien_drawing, int i, int tinted);
 static void print_alphabet(char bold_key, ALLEGRO_FONT * font24, ALLEGRO_FONT * font36); 
+static void * play_audio(void * audio_argument);
+
+typedef struct 
+{
+    ALLEGRO_SAMPLE * audio_track;
+    int * flag;
+} audio_argument_t;
 
 //Devuelve la razón por la que se interrumpió el juego. Recibe la configuración del nivel y los objetos del nivel
 int init_game (configs_t configuration, int pausa, int next_level)
@@ -132,7 +140,9 @@ void * updateDisplay(void * argumentosVarios)
     }
     
     display = al_create_display(MAX_DISP_X, MAX_DISP_Y);
-    
+
+    ALLEGRO_SAMPLE * sample = NULL;
+
     if (!display)
     {
         fprintf(stderr, "failed to create display!\n");
@@ -151,6 +161,32 @@ void * updateDisplay(void * argumentosVarios)
     else if (!al_install_keyboard())
     {
         fprintf(stderr, "unable to initiate keyboard\n");
+        display = NULL;
+        stop = -1;
+    }
+    
+    if (!al_install_audio()) {
+        fprintf(stderr, "failed to initialize audio!\n");
+        display = NULL;
+        stop = -1;
+    }
+
+    if (!al_init_acodec_addon()) {
+        fprintf(stderr, "failed to initialize audio codecs!\n");
+        display = NULL;
+        stop = -1;
+    }
+
+    if (!al_reserve_samples(1)) {
+        fprintf(stderr, "failed to reserve samples!\n");
+        display = NULL;
+        stop = -1;
+    }
+
+    sample = al_load_sample("./assets/lofi_loop.wav");
+
+    if (!sample) {
+        printf("Audio clip sample not loaded!\n");
         display = NULL;
         stop = -1;
     }
@@ -230,6 +266,10 @@ void * updateDisplay(void * argumentosVarios)
     al_get_display_width(display), al_get_display_height(display), 0);
     
     al_flip_display();
+    pthread_t audio_thread;
+    audio_argument_t audio_argument = {sample, position_p};
+    pthread_create(&audio_thread, NULL, play_audio, (void *)(&audio_argument));
+
     printMenu(SPACE_INVADERS, (void*)display, pausa, highscore_p, dificultad);
     
     ALLEGRO_FONT * fontScore;
@@ -488,6 +528,15 @@ void * updateDisplay(void * argumentosVarios)
     al_destroy_bitmap(bullet_drawing);
     al_destroy_bitmap(nave_nodriza_drawing);
     al_destroy_bitmap(player_drawing);
+    pthread_join(audio_thread, NULL);
+    pthread_exit(NULL);
+}
+
+static void * play_audio(void * audio_argument)
+{
+    audio_argument_t * audios = (audio_argument_t *)audio_argument;
+    while (*(audios->flag) != EXIT_PROGRAM)
+        al_play_sample(audios->audio_track, 0.6, 0.0, 1.0, ALLEGRO_PLAYMODE_LOOP, NULL);
     pthread_exit(NULL);
 }
 
