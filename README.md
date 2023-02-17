@@ -46,8 +46,8 @@ te suma 1 punto. Esta útlima no es una práctica que modifique considerablement
 de vital importancia en casos de desempate (por ejemplo, cuando dos jugadores matan la misma cantidad
 de aliens).
 Por último, existe un tipo especial de alien, la nave nodriza, cuya aparición es aleatoria. La misma
-te entregará 50 puntos y un corazón extra si conseguís eliminarla. Pero cuidado, al tener más de tres
-corazones, recibir un disparo no sólo va a reducirte la vida, sino que también va a restarte 50 puntos.
+te entregará 100 puntos y un corazón extra si conseguís eliminarla. Pero cuidado, si pierdes las vidas
+que te entrega la nave nodriza además también perderás 50 de los 100 puntos que te entregó.
 
 En caso de que tu puntaje final sea mayor al de la base de datos local, el jugador podrá registrar su 
 nuevo récord junto a un nick de cuatro caracteres. Así, su nombre y su marca personal aparecerán en el
