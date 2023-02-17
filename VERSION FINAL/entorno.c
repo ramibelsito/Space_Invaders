@@ -553,6 +553,7 @@ static int check_colisiones(aliens_t* alien, barrera_t* barrera, jugador_t* juga
 //La i es el índice de la bala o proyectil que estamos desactivando (le digo proyectil así reservo la "b" para "barrera")
 static void desactivar_bala ( aliens_t* alien, barrera_t* barrera, jugador_t* jugador, bullet_t* bala, int i, char impacto, int j, int * aliensVivos)
 {
+	static int colisiones_to_nodriza = 0;
 	//Indico contra qué impactó la bala...
 	switch (impacto)
 	{
@@ -583,9 +584,10 @@ static void desactivar_bala ( aliens_t* alien, barrera_t* barrera, jugador_t* ju
 			
 			if ( bala[i].colisiones == OBJETO(ALIEN,N) )	//Chequeo si la colisión fue contra la nave nodriza
 			{
-				jugador->puntaje += 50;	//Si el alien resultó ser la nave nodriza, gana 50 puntos en total.
+				jugador->puntaje += 100;	//Si el alien resultó ser la nave nodriza, gana 50 puntos en total.
 				jugador->vida++;		//Y aparte gana una vida iey! Felisiteishonz
 				(*aliensVivos)++;		//Aunque la nave nodriza no cuenta como un alien muerto para pasar de nivel!
+				colisiones_to_nodriza++;
 			}
 
 		break;	
@@ -599,9 +601,10 @@ static void desactivar_bala ( aliens_t* alien, barrera_t* barrera, jugador_t* ju
 		case 'J': //Impactó contra otra el Jugador
 			bala[i].colisiones = OBJETO(JUGADOR,j);	
 			
-			if(jugador[j].vida>3)
+			if(jugador[j].vida>3 && colisiones_to_nodriza >= 1)
 			{
 				jugador[j].puntaje -=50;
+				colisiones_to_nodriza--;
 			}
 
 			jugador[j].vida--;	
