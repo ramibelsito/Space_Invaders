@@ -10,8 +10,8 @@
 #include <allegro5/allegro_acodec.h> 
 
 #define IN_ALPHABET(X) ( ((X) >= 'A') && ((X) <= 'Z') )
-
-
+#define FPS 60.0
+float timerTick = 0.0;
 static int printMenu(int opcion, void* frontend, int* pausa, highscore_t * highscore_p, unsigned int *dificultad);
 
 static int verify_bitmap_creation(ALLEGRO_DISPLAY *, ALLEGRO_BITMAP *);
@@ -20,12 +20,19 @@ static float resize(float source_w, float source_h, float dest_w, float dest_h, 
 static void dibujar_alien(ALLEGRO_BITMAP * alien_drawing, int i, int tinted);
 static void print_alphabet(char bold_key, ALLEGRO_FONT * font24, ALLEGRO_FONT * font36); 
 static void * play_audio(void * audio_argument);
+static void * tick_tock(void * timerTick);
 
 typedef struct 
 {
     ALLEGRO_SAMPLE * audio_track;
     int * flag;
 } audio_argument_t;
+
+typedef struct 
+{
+    float * timer;
+    int * position_p;
+} clock_argument_t;
 
 //Devuelve la razón por la que se interrumpió el juego. Recibe la configuración del nivel y los objetos del nivel
 int init_game (configs_t configuration, int pausa, int next_level)
@@ -266,8 +273,11 @@ void * updateDisplay(void * argumentosVarios)
     al_get_display_width(display), al_get_display_height(display), 0);
     
     al_flip_display();
+    pthread_t clock;
     pthread_t audio_thread;
+    clock_argument_t clock_argument = {&timerTick, position_p};
     audio_argument_t audio_argument = {sample, position_p};
+    pthread_create(&clock, NULL, tick_tock, (void*)(&clock_argument));
     pthread_create(&audio_thread, NULL, play_audio, (void *)(&audio_argument));
 
     printMenu(SPACE_INVADERS, (void*)display, pausa, highscore_p, dificultad);
@@ -280,125 +290,129 @@ void * updateDisplay(void * argumentosVarios)
         {
             while( !stop )
             {
-                al_draw_scaled_bitmap(background, 0,0,
-                    al_get_bitmap_width(background),
-                    al_get_bitmap_height(background), 0 ,0 ,
-                    al_get_display_width(display), al_get_display_height(display), 0);
-                
-                for (int i = 0; i < N; i++)			//Hay filas*columnas aliens en total.
+                if (!timerTick)
                 {
-            
+                    printf("imprimo\n");
+                    al_draw_scaled_bitmap(background, 0,0,
+                        al_get_bitmap_width(background),
+                        al_get_bitmap_height(background), 0 ,0 ,
+                        al_get_display_width(display), al_get_display_height(display), 0);
                     
-                    if ((alien[i].vida > 1) || ((*dificultad == EASY) && (alien[i].vida > 0)))
+                    for (int i = 0; i < N; i++)			//Hay filas*columnas aliens en total.
                     {
-                        switch(alien[i].tipo)
-                        {
-                            case 1:
-                                
-                                dibujar_alien(alien_drawing_1, i, 0);
-                                break;
-                            case 2:
-                                dibujar_alien(alien_drawing_2, i, 0);
-                                break;
-                            case 3: 
-                                dibujar_alien(alien_drawing_3, i, 0);
-                                break;
-                            default:
-                            break;
-                        }
-                    }
-                    else if ((alien[i].vida == 1) && (*dificultad != EASY))
-                    {
-                        switch (alien[i].tipo)
-                        {
-                            case 1:
-                                dibujar_alien(alien_drawing_1, i , 1);
-                                break;
-                            case 2:
-                                dibujar_alien(alien_drawing_2, i, 1);
-                                break;
-                            case 3:
-                                dibujar_alien(alien_drawing_3, i , 1);
-                                break;
-                            default:
-                                break;
-                        }
-                    }
-                }
-                for (int i = 0; i < (N+1) ; i++)	//Una bala por cada alien + la bala del jugador.
-                {
-                    if (balas[i].active == ON)
-                    {
-                        al_draw_scaled_bitmap(bullet_drawing, 0, 0,
-                            al_get_bitmap_width(bullet_drawing),
-                            al_get_bitmap_height(bullet_drawing),
-                            balas[i].posicion[X], balas[i].posicion[Y], 
-                            HITBOX_BALAS_X, HITBOX_BALAS_Y, 0);
-                    }
-                }
-                for (int i = 0; i < M; i++)
-                {
-                    switch(barreras[i].vida)
-                    {
-                        case 3:
-                        case 4:
-                        case 5:
-                            al_draw_scaled_bitmap(barreras_drawing_3, 0, 0,
-                                al_get_bitmap_width(barreras_drawing_3),
-                                al_get_bitmap_height(barreras_drawing_3),
-                                barreras[i].posicion[X], barreras[i].posicion[Y],
-                                HITBOX_BARRERA_X, HITBOX_BARRERA_Y, 0);
-                            break;
-                        case 2:
-                            al_draw_scaled_bitmap(barreras_drawing_2, 0, 0,
-                                al_get_bitmap_width(barreras_drawing_2),
-                                al_get_bitmap_height(barreras_drawing_2),
-                                barreras[i].posicion[X], barreras[i].posicion[Y],
-                                HITBOX_BARRERA_X, HITBOX_BARRERA_Y, 0);
-                            break;
-                        case 1:
-                            al_draw_scaled_bitmap(barreras_drawing_1, 0, 0,
-                                al_get_bitmap_width(barreras_drawing_1),
-                                al_get_bitmap_height(barreras_drawing_1),
-                                barreras[i].posicion[X], barreras[i].posicion[Y],
-                                HITBOX_BARRERA_X, HITBOX_BARRERA_Y, 0);
-                            break;
-                        default: 
-                            break;
-                    }
-                }
-
-                if (alien[N].vida>0)	//El alien N+1 tiene índice N y es la nave nodriza
-                {
-                    al_draw_scaled_bitmap(nave_nodriza_drawing, 0, 0,
-                        al_get_bitmap_width(nave_nodriza_drawing),
-                        al_get_bitmap_height(nave_nodriza_drawing),
-                        alien[N].posicion[X], alien[N].posicion[Y],
-                        HITBOX_NODRIZA_X, HITBOX_NODRIZA_Y, 0);
-                }
-
-                for (int i = 0; i<jugador.vida; i++)
-                {
-                    al_draw_scaled_bitmap(player_vida_drawing, 0, 0,
-                        al_get_bitmap_width(player_vida_drawing),
-                        al_get_bitmap_height(player_vida_drawing),
-                        (i*SIZE_HEART) + 10, MAX_DISP_Y - (SIZE_HEART+5), SIZE_HEART, SIZE_HEART, 0);
-                }
                 
-                if (jugador.vida)
-                    al_draw_scaled_bitmap(player_drawing, 0, 0,
-                        al_get_bitmap_width(player_drawing), al_get_bitmap_height(player_drawing),
-                        jugador.posicion[X], jugador.posicion[Y], HITBOX_JUGADOR_X, HITBOX_JUGADOR_Y, 0);
-                al_draw_textf(fontScore, al_map_rgb(255,255,255), MAX_DISP_X-SIZE_FONT_SCORE, MAX_DISP_Y-SIZE_FONT_SCORE-2, ALLEGRO_ALIGN_RIGHT, "%d", jugador.puntaje);
-                al_flip_display();
+                        
+                        if ((alien[i].vida > 1) || ((*dificultad == EASY) && (alien[i].vida > 0)))
+                        {
+                            switch(alien[i].tipo)
+                            {
+                                case 1:
+                                    
+                                    dibujar_alien(alien_drawing_1, i, 0);
+                                    break;
+                                case 2:
+                                    dibujar_alien(alien_drawing_2, i, 0);
+                                    break;
+                                case 3: 
+                                    dibujar_alien(alien_drawing_3, i, 0);
+                                    break;
+                                default:
+                                break;
+                            }
+                        }
+                        else if ((alien[i].vida == 1) && (*dificultad != EASY))
+                        {
+                            switch (alien[i].tipo)
+                            {
+                                case 1:
+                                    dibujar_alien(alien_drawing_1, i , 1);
+                                    break;
+                                case 2:
+                                    dibujar_alien(alien_drawing_2, i, 1);
+                                    break;
+                                case 3:
+                                    dibujar_alien(alien_drawing_3, i , 1);
+                                    break;
+                                default:
+                                    break;
+                            }
+                        }
+                    }
+                    for (int i = 0; i < (N+1) ; i++)	//Una bala por cada alien + la bala del jugador.
+                    {
+                        if (balas[i].active == ON)
+                        {
+                            al_draw_scaled_bitmap(bullet_drawing, 0, 0,
+                                al_get_bitmap_width(bullet_drawing),
+                                al_get_bitmap_height(bullet_drawing),
+                                balas[i].posicion[X], balas[i].posicion[Y], 
+                                HITBOX_BALAS_X, HITBOX_BALAS_Y, 0);
+                        }
+                    }
+                    for (int i = 0; i < M; i++)
+                    {
+                        switch(barreras[i].vida)
+                        {
+                            case 3:
+                            case 4:
+                            case 5:
+                                al_draw_scaled_bitmap(barreras_drawing_3, 0, 0,
+                                    al_get_bitmap_width(barreras_drawing_3),
+                                    al_get_bitmap_height(barreras_drawing_3),
+                                    barreras[i].posicion[X], barreras[i].posicion[Y],
+                                    HITBOX_BARRERA_X, HITBOX_BARRERA_Y, 0);
+                                break;
+                            case 2:
+                                al_draw_scaled_bitmap(barreras_drawing_2, 0, 0,
+                                    al_get_bitmap_width(barreras_drawing_2),
+                                    al_get_bitmap_height(barreras_drawing_2),
+                                    barreras[i].posicion[X], barreras[i].posicion[Y],
+                                    HITBOX_BARRERA_X, HITBOX_BARRERA_Y, 0);
+                                break;
+                            case 1:
+                                al_draw_scaled_bitmap(barreras_drawing_1, 0, 0,
+                                    al_get_bitmap_width(barreras_drawing_1),
+                                    al_get_bitmap_height(barreras_drawing_1),
+                                    barreras[i].posicion[X], barreras[i].posicion[Y],
+                                    HITBOX_BARRERA_X, HITBOX_BARRERA_Y, 0);
+                                break;
+                            default: 
+                                break;
+                        }
+                    }
+
+                    if (alien[N].vida>0)	//El alien N+1 tiene índice N y es la nave nodriza
+                    {
+                        al_draw_scaled_bitmap(nave_nodriza_drawing, 0, 0,
+                            al_get_bitmap_width(nave_nodriza_drawing),
+                            al_get_bitmap_height(nave_nodriza_drawing),
+                            alien[N].posicion[X], alien[N].posicion[Y],
+                            HITBOX_NODRIZA_X, HITBOX_NODRIZA_Y, 0);
+                    }
+
+                    for (int i = 0; i<jugador.vida; i++)
+                    {
+                        al_draw_scaled_bitmap(player_vida_drawing, 0, 0,
+                            al_get_bitmap_width(player_vida_drawing),
+                            al_get_bitmap_height(player_vida_drawing),
+                            (i*SIZE_HEART) + 10, MAX_DISP_Y - (SIZE_HEART+5), SIZE_HEART, SIZE_HEART, 0);
+                    }
+                    
+                    if (jugador.vida)
+                        al_draw_scaled_bitmap(player_drawing, 0, 0,
+                            al_get_bitmap_width(player_drawing), al_get_bitmap_height(player_drawing),
+                            jugador.posicion[X], jugador.posicion[Y], HITBOX_JUGADOR_X, HITBOX_JUGADOR_Y, 0);
+                    al_draw_textf(fontScore, al_map_rgb(255,255,255), MAX_DISP_X-SIZE_FONT_SCORE, MAX_DISP_Y-SIZE_FONT_SCORE-2, ALLEGRO_ALIGN_RIGHT, "%d", jugador.puntaje);
+                    al_flip_display();
+                }
             }
-            usleep(100*ONE_MS); // para que se muestre el menu correcto (si es pausa = 1 o no)
-            if (*position_p != NEXT_LEVEL_ANIMATION)
-            {
-                printMenu(PLAY, (void*)display, pausa, highscore_p, dificultad);
+                usleep(100*ONE_MS); // para que se muestre el menu correcto (si es pausa = 1 o no)
+                if (*position_p != NEXT_LEVEL_ANIMATION)
+                {
+                    printMenu(PLAY, (void*)display, pausa, highscore_p, dificultad);
+                }
+                previous_position = PLAY;
             }
-            previous_position = PLAY;
-        }
         else
         {
             while(stop && ((*position_p) != EXIT_PROGRAM))
@@ -529,6 +543,32 @@ void * updateDisplay(void * argumentosVarios)
     al_destroy_bitmap(nave_nodriza_drawing);
     al_destroy_bitmap(player_drawing);
     pthread_join(audio_thread, NULL);
+    pthread_join(clock, NULL);
+    pthread_exit(NULL);
+}
+
+static void * tick_tock(void * timerTick)
+{
+    clock_argument_t * argument = (clock_argument_t *)timerTick;
+    float * timer = argument->timer;
+    int * position_p = argument->position_p;
+    while (*position_p != EXIT_PROGRAM)
+    {   
+        clock_t start_time = clock(); // Obtiene el tiempo actual en ciclos de reloj
+        while (*timer)
+        {
+            clock_t current_time = clock(); // Obtiene el tiempo actual en ciclos de reloj
+            if ((double)(current_time - start_time) / CLOCKS_PER_SEC >= 1.0/FPS) { // Si han pasado 1/60 de segundo
+                start_time = current_time; // Reinicia el contador de tiempo
+                *timer++; // Incrementa el contador
+            }
+
+            if (*timer >= FPS) { // Si han pasado 60 ciclos de 1/60 de segundo
+                *timer = 0; // Reinicia el contador
+            }
+                
+        }
+    }
     pthread_exit(NULL);
 }
 
