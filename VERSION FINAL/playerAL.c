@@ -292,7 +292,6 @@ void * updateDisplay(void * argumentosVarios)
             {
                 if (!timerTick)
                 {
-                    printf("imprimo\n");
                     al_draw_scaled_bitmap(background, 0,0,
                         al_get_bitmap_width(background),
                         al_get_bitmap_height(background), 0 ,0 ,
